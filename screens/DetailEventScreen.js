@@ -1,5 +1,5 @@
 import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View,Image } from 'react-native'
 import { Appbar } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -29,6 +29,12 @@ export default function DetailEventScreen(props) {
                
                 
             </LinearGradient>
+            <Image style={{width:'100%',height:200}}     
+                    source={{
+                    uri: `https://museum-noyabrsk.ru${props.route.params.event.image}`,
+                    
+                }}/>
+               
             <Text>{JSON.stringify(props.route.params.event)}</Text>
             </View>
     )
