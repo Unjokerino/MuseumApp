@@ -2,12 +2,44 @@ import React,{useState} from 'react';
 import { StyleSheet, Text, View,TouchableOpacity,Image } from 'react-native';
 import { SliderBox } from "react-native-image-slider-box";
 import {Title,Caption,Appbar, Headline} from "react-native-paper";
-import FastImage from 'react-native-fast-image'
+
+import moment from "moment";
 
 export default function EventCard(props) {
-  
+  const afisha_type = {
+    "77":"Выставки",
+    "78":"Конкурсы",
+    "82":"Конференции",
+    "79":"Мастер-классы",
+    "83":"Мероприятия",
+    "80":"Музейные Мероприятия",
+    "81":"Праздники",
+    "54":"Виртуальные выставки",
+    "53":"Постоянные выставки",
+    "55":"Фотоматериалы",
+    "51":"Мир природы",
+    "49":"Вещевая коллекция и этнография",
+    "47":"Геология",
+    "43":"Графика",
+    "46":"Живопись",
+    "45":"Мир детства",
+    "48":"Скульптура",
+    "44":"Увлечение и колеционирование ",
+    "40":"Мастер-классы",
+    "39":"Творческие мастерские",
+    "41":"Тематические лекции",
+    "27":"Броши",
+    "28":"Визитницы",
+    "29":"Деревяная матрешка",
+    "30":"Игрушки из шерсти",
+    "31":"Колокольчики",
+    "32":"Кулоны",
+    "33":"Магниты",
+    "34":"Сувенирные монеты",
+    "35":"Текстильные куклы",
+    "36":"Упаковка подарков и сувениров "}
+  const eventData = props.event
   return (
- 
     <TouchableOpacity onPress={() =>{
       props.navigation.navigate("DetailEventScreen",{event:props.event})
     }} style={styles.container}>
@@ -16,17 +48,19 @@ export default function EventCard(props) {
             <Image
                 style={{   borderTopLeftRadius:10,borderBottomLeftRadius:10, width: 150, height: 150 }}
                 source={{
-                    uri: `https://museum-noyabrsk.ru${props.event.image}`,
+                    uri: eventData.img !== undefined ? eventData.img !== "" ? eventData.img : "https://picsum.photos/300/300" : "https://picsum.photos/200/300",
                     
                 }}
-                resizeMode={FastImage.resizeMode.cover}
+
             />
-            <Text style={styles.badge}>до 28 марта</Text>
+            
+            {eventData.seanses != undefined ? <Text style={styles.badge}>до {moment(eventData.seanses[eventData.seanses.length -1].date).format("DD.MM")}</Text> : false}
         </View>
         <View style={styles.infoContainer}>
-            <Text style={styles.tag}>{props.event.type}</Text>
-              <Text style={styles.title}>{props.event.title}</Text>
-            <Caption>{props.event.date}</Caption>
+          
+            <Text style={styles.tag}>{afisha_type[eventData.type_afisha] !== undefined ? afisha_type[eventData.type_afisha] : eventData.type_afisha}</Text>
+              <Text style={styles.title}>{eventData.name}</Text>
+            <Caption>{eventData.date}</Caption>
         </View>
         
     </TouchableOpacity>
