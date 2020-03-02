@@ -49,18 +49,16 @@ export default function EventCard(props) {
                 style={{   borderTopLeftRadius:10,borderBottomLeftRadius:10, width: 150, height: 150 }}
                 source={{
                     uri: eventData.img !== undefined ? eventData.img !== "" ? eventData.img : "https://picsum.photos/300/300" : "https://picsum.photos/200/300",
-                    
                 }}
 
             />
             
-            {eventData.seanses != undefined ? <Text style={styles.badge}>до {moment(eventData.seanses[eventData.seanses.length -1].date).format("DD.MM")}</Text> : false}
+            {eventData.seanses != undefined ? <Text style={styles.badge}>до {moment(eventData.seanses[eventData.seanses.length -1].date).format("DD.MM")}</Text> : eventData.price != undefined ? <Text style={[styles.badge, eventData.price.length > 10 ? {top:100,bottom:0,borderBottomLeftRadius:5} : '']}>{eventData.price}</Text> :  false}
         </View>
         <View style={styles.infoContainer}>
-          
-            <Text style={styles.tag}>{afisha_type[eventData.type_afisha] !== undefined ? afisha_type[eventData.type_afisha] : eventData.type_afisha}</Text>
-              <Text style={styles.title}>{eventData.name}</Text>
-            <Caption>{eventData.date}</Caption>
+            <Text style={styles.tag}>{typeof eventData.type_afisha === "object"  ?  eventData.type_afisha.name :  afisha_type[eventData.type_afisha] !== undefined ? afisha_type[eventData.type_afisha] : eventData.type_afisha}</Text>
+            <Text style={styles.title}>{eventData.name}</Text>
+            <Caption>{eventData.seanses != undefined && eventData.seanses.length > 0 ? eventData.seanses[0].date.split(' ')[0] : eventData.date}</Caption>
         </View>
         
     </TouchableOpacity>
@@ -79,13 +77,17 @@ const styles = StyleSheet.create({
   },
   tag:{
     color:'#1E87F0',
-    fontWeight:"700"
+    fontWeight:"700",
+    maxWidth:175,
   },
   badge:{
     backgroundColor:'#1E87F0',
     color:'#fff',
     position:'absolute',
     top: 10,
+    minWidth:75,
+    justifyContent:'center',
+    textAlign:'center',
     right:0,
     padding:4,
     fontWeight:"700"

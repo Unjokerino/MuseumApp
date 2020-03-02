@@ -17,7 +17,7 @@ const NAV_BAR_HEIGHT = HEADER_HEIGHT - STATUS_BAR_HEIGHT;
 export default function DetailEventScreen(props) {
     const eventData = props.route.params.event
     const ruTitles = {
-        description: "Описание",
+    
         phone:'Телефон',
         price:'Цена',
         date:'Дата',
@@ -33,7 +33,42 @@ export default function DetailEventScreen(props) {
         number: "Номер",
         legend: "История",
         fond: "Фонд",
+        description: "Описание",
     }
+    const afisha_type = {
+        "77":"Выставки",
+        "78":"Конкурсы",
+        "82":"Конференции",
+        "79":"Мастер-классы",
+        "83":"Мероприятия",
+        "80":"Музейные Мероприятия",
+        "81":"Праздники",
+        "54":"Виртуальные выставки",
+        "53":"Постоянные выставки",
+        "55":"Фотоматериалы",
+        "51":"Мир природы",
+        "49":"Вещевая коллекция и этнография",
+        "47":"Геология",
+        "43":"Графика",
+        "46":"Живопись",
+        "45":"Мир детства",
+        "48":"Скульптура",
+        "44":"Увлечение и колеционирование ",
+        "40":"Мастер-классы",
+        "39":"Творческие мастерские",
+        "41":"Тематические лекции",
+        "27":"Броши",
+        "28":"Визитницы",
+        "29":"Деревяная матрешка",
+        "30":"Игрушки из шерсти",
+        "31":"Колокольчики",
+        "32":"Кулоны",
+        "33":"Магниты",
+        "34":"Сувенирные монеты",
+        "35":"Текстильные куклы",
+        "36":"Упаковка подарков и сувениров "}
+
+
     const [attrs,setAttrs] = useState({})
 
     useEffect(() => {
@@ -46,6 +81,7 @@ export default function DetailEventScreen(props) {
           <View style={styles.statusBar} />
           <View style={styles.navBar}>
             <Appbar.Action color="#fff" onPress={()=>{props.navigation.goBack()}} icon="arrow-left"></Appbar.Action>
+            <Appbar.Content title={eventData.name}></Appbar.Content>
           </View>
         </View>
       )
@@ -58,9 +94,9 @@ export default function DetailEventScreen(props) {
  
                 <ScrollView>
              
-                    <View style={{paddingHorizontal:10}} >
+                    <View style={{paddingHorizontal:10,marginVertical:10}} >
     
-                        <Title>{eventData.name}</Title>
+                        
                         {eventData.seanses !== undefined && eventData.seanses !== null ?
                             <ScrollView showsHorizontalScrollIndicator={false} horizontal={true}>
                             {eventData.seanses.map(seans =>{
@@ -80,17 +116,19 @@ export default function DetailEventScreen(props) {
                         })
                     
                     }
-                   
-                    {Array.isArray(styles.gallery) ? 
+                    {console.log(Array.isArray(eventData.gallery))}
+                    {Array.isArray(eventData.gallery) ? 
                     <View>
                         <Title style={styles.title}>Фотогаллерея</Title>
                         <ScrollView showsHorizontalScrollIndicator={false} horizontal={true}>
                         
                             {eventData.gallery.map(item =>{
                                 return(
+                                    <TouchableOpacity>
                                 <Image style={{width:150,height:200,marginRight:10,borderRadius:10}}     
                                 source={{
-                                uri: item}} ></Image>
+                                uri: item}} />
+                                </TouchableOpacity>
                                 )
                             })}
                         </ScrollView></View> : <View></View>
@@ -134,7 +172,13 @@ export default function DetailEventScreen(props) {
             
             extraScrollHeight={20}
             navbarColor={'#fe7660'}
-            title={eventData.name}
+            title={
+            <View style={{backgroundColor:'#0000004d',flex:1,width:'100%',alignItems:'flex-end',paddingVertical:25,paddingHorizontal:15,flexDirection:'row'}}>
+              <View style={{flexDirection:"row"}}>
+                <View style={styles.circle}></View>
+                <Text style={styles.eventTitle}>{typeof eventData.type_afisha === "object"  ?  eventData.type_afisha.name :  afisha_type[eventData.type_afisha] !== undefined ? afisha_type[eventData.type_afisha] : eventData.type_afisha}</Text>
+                </View>
+            </View>}
             renderNavBar={renderNavBar}
             backgroundImage={img}
             backgroundImageScale={1.2}
@@ -156,8 +200,26 @@ const styles = StyleSheet.create({
         flex:1
     },
     title:{
-        fontSize:14,fontWeight:'bold',marginVertical:8
+        fontSize:14,
+        
+        
+
     },
+    circle:{
+        marginRight:10,
+        alignSelf:'center',
+        width:30,
+        height:30,
+        backgroundColor:'#2D9CDB',
+        borderColor:'#fff',
+        borderRadius:15,
+        borderWidth:3
+    },  
+    eventTitle:{
+        alignSelf:'center',
+        color:'#fff',
+        fontWeight:"200"
+    },  
     navContainer: {
         height: HEADER_HEIGHT,
         marginHorizontal: 10,

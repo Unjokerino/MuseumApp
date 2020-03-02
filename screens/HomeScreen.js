@@ -104,6 +104,7 @@ export default function HomeScreen(props) {
 
   function getData() {
     fetchData(categoryIndex)
+    
   }
 
   async function fetchData(cat_index) {
@@ -121,6 +122,7 @@ export default function HomeScreen(props) {
         setFadeAnim(new Animated.Value(0))
       })
     )
+ 
   }
 
   useEffect(() => {
@@ -157,13 +159,7 @@ export default function HomeScreen(props) {
       <ScrollView
         onScroll={({nativeEvent}) => {
           if (isCloseToBottom(nativeEvent)) {
-            Animated.timing(
-              fadeAnim,
-              {
-                toValue: 1,
-                duration: 1000,
-              }
-            ).start();
+            
           }
         }}
         scrollEventThrottle={400}
@@ -211,13 +207,13 @@ export default function HomeScreen(props) {
             return <EventCard key={event.title} event={event} {...props} />;
           }
         }):<View></View>}
-                <Animated.View                 // Special animatable View
+    <Animated.View                 // Special animatable View
       style={{
         ...props.style,
-        opacity: fadeAnim,         // Bind opacity to animated value
+                // Bind opacity to animated value
       }}
     >
-      <Button color="#fe7660" onPress={() =>{}}>Перейти в раздел</Button>
+      <Button color="#fe7660" onPress={() =>{props.navigation.navigate('EventScreen',{...categories[categoryIndex]})}}>Перейти в раздел</Button>
     </Animated.View>
        
       </ScrollView>
