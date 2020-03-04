@@ -184,7 +184,7 @@ export default function DetailEventScreen(props) {
             <View style={{backgroundColor:'#0000004d',flex:1,height:'100%',width:'100%',alignItems:'flex-end',paddingVertical:25,paddingHorizontal:15,flexDirection:'row'}}>
               <View style={{flexDirection:"row"}}>
                 <View style={styles.circle}></View>
-                <Text style={styles.eventTitle}>{typeof eventData.type_afisha === "object"  ?  eventData.type_afisha.name :  afisha_type[eventData.type_afisha] !== undefined ? afisha_type[eventData.type_afisha] : eventData.type_afisha}</Text>
+                <Text style={styles.eventTitle}>{typeof eventData.type_afisha === "number" && eventData.type_afisha ?  eventData.type_afisha.name :  afisha_type[eventData.type_afisha] !== undefined ? afisha_type[eventData.type_afisha] : eventData.type_afisha}</Text>
                 </View>
             </View>}
             renderNavBar={renderNavBar}

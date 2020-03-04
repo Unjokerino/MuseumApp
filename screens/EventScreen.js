@@ -134,6 +134,10 @@ export default function EventScreen(props) {
         setdates(dates)
     }
 
+    useEffect(() => {
+        categoryIndex >= 0 ? searchCategory(categories[categoryIndex]) : setSearchResult(events)
+    }, [categoryIndex])
+
     function getData() {
         fetchData(props.route.params.url)
     }
@@ -216,7 +220,7 @@ export default function EventScreen(props) {
               {categories.map((category,index) =>{
 
                 return(
-                    <TouchableOpacity key={index} onPress={()=>{searchCategory(category); index === categoryIndex ? setcategoryIndex(-1) : setcategoryIndex(index) }}>
+                    <TouchableOpacity key={index} onPress={()=>{index === categoryIndex ? setcategoryIndex(-1) : setcategoryIndex(index) }}>
                         <Text style={[styles.category,categoryIndex === index && {color:'#1E87F0',borderBottomColor:'#1E87F0'}]}>{category}</Text>
                     </TouchableOpacity>
                 )
