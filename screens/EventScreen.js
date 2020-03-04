@@ -35,6 +35,7 @@ export default function EventScreen(props) {
     
 
     const searchSeanses = (date) =>{
+        setShow(false)
         let available_seanses = []
         events.forEach(event =>{
             event.seanses.forEach(seans =>{
@@ -169,7 +170,7 @@ export default function EventScreen(props) {
         
 
   
-            {show && (
+            {show ? (
                 <DateTimePicker
                 testID="dateTimePicker"
                 timeZoneOffsetInMinutes={0}
@@ -179,7 +180,7 @@ export default function EventScreen(props) {
                 display="default"
                 onChange={searchDate}
                 />
-            )}
+            ) : <View/>}
       
           
           <View style={[styles.categories,{display:props.route.params.title === "Выставки" ? 'flex' : 'none'}]}>
@@ -201,6 +202,9 @@ export default function EventScreen(props) {
           
             }):<View></View>}
         </ScrollView>
+        
+        
+
         </View>
     )
 }

@@ -110,19 +110,19 @@ export default function HomeScreen(props) {
   async function fetchData(cat_index) {
 
     
-    setRefreshing(true);
-    fetch(categories[cat_index].url,{  headers: {
-      "Cache-Control": "no-cache",
-      "Content-Type": "application/json",
-      Pragma: "no-cache"
-    }}).then(res =>
-      res.json().then(response => {
-        setRefreshing(false);
-        setEvents(response)
-        setFadeAnim(new Animated.Value(0))
-      })
-    )
- 
+  setRefreshing(true);
+  let result = await fetch(categories[cat_index].url,{  headers: {
+    "Cache-Control": "no-cache",
+    "Content-Type": "application/json",
+    Pragma: "no-cache"
+  }}).then(res =>
+    res.json().then(response => {
+      setRefreshing(false);
+      console.log(response)
+      setEvents(response)
+      setFadeAnim(new Animated.Value(0))
+    })
+  )
   }
 
   useEffect(() => {

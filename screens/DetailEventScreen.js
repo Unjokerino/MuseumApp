@@ -90,7 +90,8 @@ export default function DetailEventScreen(props) {
  
         return (
             <View style={{flex:1,backgroundColor:'#fff'}}>
-             
+                
+                {eventData.price && <TouchableOpacity style={styles.buyButton}><Text style={{color:'#fff',fontSize:16}}>Buy</Text></TouchableOpacity>}
  
                 <ScrollView>
              
@@ -161,10 +162,10 @@ export default function DetailEventScreen(props) {
         })
         return current_attrs
     }
-    const img = {uri: eventData.img !== undefined ? eventData.img !== "" ? eventData.img : "https://picsum.photos/700/700" : eventData.baner !== undefined ?  eventData.baner : "https://picsum.photos/700/700"}
+    const img = {uri: eventData.img ? eventData.img !== "" ? eventData.img : "https://picsum.photos/700/700" : eventData.baner ?  eventData.baner.url : "https://picsum.photos/700/700"}
     return (
         <View style={styles.container}>
-            <View style={{height:30,backgroundColor:'#fe7660'}}></View>
+            <View style={{display:Platform.OS === 'ios' ? 'none' : 'flex', height:30,backgroundColor:'#fe7660'}}></View>
             <ReactNativeParallaxHeader
             headerMinHeight={HEADER_HEIGHT}
             headerMaxHeight={250}
@@ -173,7 +174,7 @@ export default function DetailEventScreen(props) {
             extraScrollHeight={20}
             navbarColor={'#fe7660'}
             title={
-            <View style={{backgroundColor:'#0000004d',flex:1,width:'100%',alignItems:'flex-end',paddingVertical:25,paddingHorizontal:15,flexDirection:'row'}}>
+            <View style={{backgroundColor:'#0000004d',flex:1,height:'100%',width:'100%',alignItems:'flex-end',paddingVertical:25,paddingHorizontal:15,flexDirection:'row'}}>
               <View style={{flexDirection:"row"}}>
                 <View style={styles.circle}></View>
                 <Text style={styles.eventTitle}>{typeof eventData.type_afisha === "object"  ?  eventData.type_afisha.name :  afisha_type[eventData.type_afisha] !== undefined ? afisha_type[eventData.type_afisha] : eventData.type_afisha}</Text>
@@ -201,10 +202,26 @@ const styles = StyleSheet.create({
     },
     title:{
         fontSize:14,
-        
-        
-
     },
+    buyButton:{
+        alignSelf:'center',
+        marginTop:10,
+        width:200,
+        paddingVertical:10,
+        borderRadius:8,
+        alignItems:'center',
+        textAlign:'center',
+        backgroundColor:'#55b9f3',
+        shadowColor: "#55b9f3",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+
+elevation: 5,
+    },  
     circle:{
         marginRight:10,
         alignSelf:'center',

@@ -48,7 +48,7 @@ export default function EventCard(props) {
             <Image
                 style={{   borderTopLeftRadius:10,borderBottomLeftRadius:10, width: 150, height: 150 }}
                 source={{
-                    uri: eventData.img !== undefined ? eventData.img !== "" ? eventData.img : "https://picsum.photos/300/300" : "https://picsum.photos/200/300",
+                    uri: eventData.img ? eventData.img !== "" ? eventData.img : "https://picsum.photos/300/300" : "https://picsum.photos/200/300",
                 }}
 
             />
