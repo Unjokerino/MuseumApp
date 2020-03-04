@@ -118,7 +118,7 @@ export default function HomeScreen(props) {
   }}).then(res =>
     res.json().then(response => {
       setRefreshing(false);
-      console.log(response)
+      
       setEvents(response)
       setFadeAnim(new Animated.Value(0))
     })
@@ -193,7 +193,7 @@ export default function HomeScreen(props) {
               return(
                 <TouchableOpacity onPress={() =>{
                   setCategoryIndex(index)
-                }} style={[styles.category,{backgroundColor: categoryIndex === index ? '#fe7660' : '#fff'}]}>             
+                }} style={[styles.category,{backgroundColor: categoryIndex === index ? '#fe7660' : '#f7f7f7'}]}>             
                 <Text style={[styles.categoryText,{color:categoryIndex === index ? '#fff' : '#000'}]}> {category.title} </Text>
               </TouchableOpacity>
               )
@@ -224,7 +224,7 @@ export default function HomeScreen(props) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#E5E5E5"
+    backgroundColor: "#f7f7f7"
   },
   category: {
     width: 100,
@@ -233,9 +233,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginHorizontal: 5,
     paddingHorizontal: 16,
-    elevation: 1,
-    backgroundColor: "#fff",
-    borderRadius: 12,
+    borderColor:'#e0e0e0',
+    borderWidth:1,
+    borderRadius: 6,
     fontSize: 12
   },
   categoryText: {

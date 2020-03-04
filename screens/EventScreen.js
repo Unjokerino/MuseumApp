@@ -16,19 +16,18 @@ import EventCard from "../components/EventCard";
 import { Appbar, Button } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import DateTimePicker from '@react-native-community/datetimepicker';
-
+import Fuse from 'fuse.js'
 
 export default function EventScreen(props) {
   
     const [events, setEvents] = useState([]);
+    const [categories, setcategories] = useState([])
     const [showDateBadge, setShowDateBadge] = useState(false)
     const [searchResult,setSearchResult] = useState([])
     const [dates, setdates] = useState([])
     const [refreshing, setRefreshing] = useState(false);
-    const [categoryIndex,setCategoryIndex] = useState(0)
-    const [wait, setwait] = useState(false)
     const [fadeAnim,setFadeAnim] = useState(new Animated.Value(0))
-
+    const [categoryIndex, setcategoryIndex] = useState(-1)
     const [date, setDate] = useState(new Date(moment(new Date()).add(-1,'days')));
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
@@ -56,6 +55,27 @@ export default function EventScreen(props) {
       setShowDateBadge(true)
       setShow(Platform.OS === 'ios' ? true : false);
     };
+    
+    function onlyUnique(value, index, self) { 
+        return self.indexOf(value) === index;
+    }
+
+    const searchCategory = (category) => {
+        var options = {
+            shouldSort: true,
+            threshold: 0.6,
+            location: 0,
+            distance: 100,
+            maxPatternLength: 32,
+            minMatchCharLength: 1,
+            keys: [
+              "type_afisha.name"
+            ]
+          };
+          var fuse = new Fuse(events, options); // "list" is the item array
+          var result = fuse.search(category);
+          setSearchResult(result)
+    }
   
     const showMode = currentMode => {
       setShow(true);
@@ -130,7 +150,15 @@ export default function EventScreen(props) {
         setRefreshing(false);
         setEvents(response)
         setSearchResult(response)
+        let types = []
+        
+        response.forEach(element => {
+            console.log(element.type_afisha)
+            element.type_afisha && types.push(element.type_afisha.name)
+        });
         setFadeAnim(new Animated.Value(0))
+        
+        setcategories(types.filter( onlyUnique))
         })
     )
     }
@@ -148,17 +176,18 @@ export default function EventScreen(props) {
           start={[0, 0]}
           end={[3, 0]}
         >
-             <Appbar.Action
+            <Appbar.Action
             color="#fff"
             icon="arrow-left"
             onPress={() => props.navigation.goBack()}
           />
           <Appbar.Content title={props.route.params.title}> </Appbar.Content>
-          <Appbar.Action
+         
+          {events.length > 0 && events[0].seanses && <Appbar.Action
             color="#fff"
             icon="calendar" 
             onPress={showDatepicker}
-          />
+          />}
         </LinearGradient>
         
         <TouchableOpacity  onPress={()=>{setShowDateBadge(false);setSearchResult(events)}} style={{display:showDateBadge ? "flex" : "none"}}>
@@ -182,17 +211,17 @@ export default function EventScreen(props) {
                 />
             ) : <View/>}
       
-          
-          <View style={[styles.categories,{display:props.route.params.title === "Выставки" ? 'flex' : 'none'}]}>
-              <TouchableOpacity>
-                  <Text style={styles.category}>Постоянные</Text>
-              </TouchableOpacity>
-              <TouchableOpacity>
-                  <Text style={styles.category}>Виртуальные</Text>
-              </TouchableOpacity>
-              <TouchableOpacity>
-                  <Text style={styles.category}>Передвижные</Text>
-              </TouchableOpacity>
+      <View style={{height:100, display: categories.length > 1 ? 'flex' : 'none'}}>
+          <ScrollView showsHorizontalScrollIndicator={false} horizontal={true} style={[styles.categories]}>
+              {categories.map((category,index) =>{
+
+                return(
+                    <TouchableOpacity key={index} onPress={()=>{searchCategory(category); index === categoryIndex ? setcategoryIndex(-1) : setcategoryIndex(index) }}>
+                        <Text style={[styles.category,categoryIndex === index && {color:'#1E87F0',borderBottomColor:'#1E87F0'}]}>{category}</Text>
+                    </TouchableOpacity>
+                )
+              })}
+          </ScrollView>
           </View>
         <ScrollView style={{marginTop:10}}>
             {searchResult.length === 0 ? <Text style={{width:'100%',textAlign:'center',color:'#000'}}>Ничего не найдено :(</Text> : <View></View>}
@@ -215,7 +244,7 @@ const styles = StyleSheet.create({
         marginTop:20,
         marginBottom:10,
         flexDirection:'row',
-        justifyContent:'center',
+        
         paddingHorizontal:10,
     },  
     badge:{marginTop:10,padding:8,marginLeft:10,backgroundColor:'#fd6b53',color:'#fff',borderRadius:6,borderWidth:1,borderColor:'#fe7660',width:75,alignItems:'center',textAlign:'center'},

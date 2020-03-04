@@ -1,11 +1,10 @@
 import React,{useEffect,useState} from 'react'
 import { StyleSheet, Text, View,Image,Dimensions } from 'react-native'
-import { Appbar,Title,Caption } from 'react-native-paper';
+import { Appbar,Title,Caption, Portal,Provider,Modal,Button } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ScrollView, TouchableOpacity } from 'react-native-gesture-handler';
+import { ScrollView, TouchableOpacity, TextInput } from 'react-native-gesture-handler';
 import ReactNativeParallaxHeader from 'react-native-parallax-header';
 import moment from "moment";
-
 
 const SCREEN_HEIGHT = Dimensions.get('window').height
 const IS_IPHONE_X = SCREEN_HEIGHT === 812 || SCREEN_HEIGHT === 896;
@@ -16,6 +15,11 @@ const NAV_BAR_HEIGHT = HEADER_HEIGHT - STATUS_BAR_HEIGHT;
 
 export default function DetailEventScreen(props) {
     const eventData = props.route.params.event
+    const [visible, setvisible] = useState(false)
+
+    const _showModal = () => setvisible(true);
+    const _hideModal = () => setvisible(false);
+
     const ruTitles = {
     
         phone:'Телефон',
@@ -89,9 +93,8 @@ export default function DetailEventScreen(props) {
     function renderContent() {
  
         return (
-            <View style={{flex:1,backgroundColor:'#fff'}}>
-                
-                {eventData.price && <TouchableOpacity style={styles.buyButton}><Text style={{color:'#fff',fontSize:16}}>Buy</Text></TouchableOpacity>}
+            <View style={{flex:1,backgroundColor:'#fff',position:'relative'}}>
+
  
                 <ScrollView>
              
@@ -137,7 +140,10 @@ export default function DetailEventScreen(props) {
                         }
                     
                     </View>
+                   
+
                 </ScrollView>
+           
                 </View>
         )
     }
@@ -164,7 +170,8 @@ export default function DetailEventScreen(props) {
     }
     const img = {uri: eventData.img ? eventData.img !== "" ? eventData.img : "https://picsum.photos/700/700" : eventData.baner ?  eventData.baner.url : "https://picsum.photos/700/700"}
     return (
-        <View style={styles.container}>
+        <Provider style={styles.container}>
+
             <View style={{display:Platform.OS === 'ios' ? 'none' : 'flex', height:30,backgroundColor:'#fe7660'}}></View>
             <ReactNativeParallaxHeader
             headerMinHeight={HEADER_HEIGHT}
@@ -189,7 +196,28 @@ export default function DetailEventScreen(props) {
             innerContainerStyle={{ flex: 1 }}
 
             />
-        </View>
+            {eventData.price && <View style={styles.buyButton}><TouchableOpacity  onPress={_showModal} style={styles.buyButtonOpacity}><Text style={{color:'#fff',fontSize:16}}>Купить</Text></TouchableOpacity></View>}
+          
+            <Portal>
+                <Modal visible={visible} onDismiss={_hideModal}>
+                   
+                    <View style={styles.modal}>
+                        <Title>{eventData.name}</Title>
+                        <Caption>Цена</Caption>
+                        <Text>{eventData.price}</Text>
+
+                        <Caption>Номер телефона</Caption>
+                        <TextInput placeholder=""></TextInput>
+                        <Caption>Email</Caption>
+                        <TextInput placeholder=""></TextInput>
+                        <Caption>Telegram</Caption>
+                        <TextInput placeholder=""></TextInput>
+                        <Button onPress={_hideModal} style={{marginVertical:10}}>Отправить</Button>
+                    </View>
+                </Modal>
+            </Portal>
+       
+        </Provider>
         );
 }
 
@@ -198,13 +226,27 @@ export default function DetailEventScreen(props) {
 
 const styles = StyleSheet.create({
     container:{
-        flex:1
+        flex:1,
+        position:'relative'
     },
     title:{
         fontSize:14,
     },
+    modal:{
+        paddingVertical:10,
+        paddingHorizontal:20,
+        backgroundColor:'#fff'
+    },
+    buyButtonOpacity:{
+        width:'100%',
+        height:'100%'
+    },
     buyButton:{
         alignSelf:'center',
+        position: 'absolute',
+      
+        bottom: 30,
+        
         marginTop:10,
         width:200,
         paddingVertical:10,
@@ -219,8 +261,7 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
-
-elevation: 5,
+        elevation: 7,
     },  
     circle:{
         marginRight:10,
