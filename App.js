@@ -1,7 +1,7 @@
-import * as React from "react";
+import React,{useEffect,useState} from 'react'
 import { View, Text, Button, StyleSheet, Dimensions } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
-
+import * as Font from 'expo-font';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
@@ -16,6 +16,14 @@ import AppNavigator from "./navigation/AppNavigator"
 
 
 export default function App() {
+  useEffect(() => {
+    Font.loadAsync({
+      'Roboto-Medium': require('./assets/fonts/Roboto-Medium.ttf'),
+      'Roboto-Regular': require('./assets/fonts/Roboto-Regular.ttf'),
+      'Roboto-Thin': require('./assets/fonts/Roboto-Thin.ttf'),
+
+    });
+  }, [])
   return (
     <AppNavigator></AppNavigator>
   );

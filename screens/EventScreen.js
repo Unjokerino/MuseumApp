@@ -47,6 +47,8 @@ export default function EventScreen(props) {
         setSearchResult(available_seanses)
     }
 
+
+
     const searchDate = (event, selectedDate) => {
       const currentDate = selectedDate || date;
       setShow(false);
@@ -139,6 +141,7 @@ export default function EventScreen(props) {
     }, [categoryIndex])
 
     function getData() {
+        setcategoryIndex(-1)
         fetchData(props.route.params.url)
     }
     async function fetchData(url) {
@@ -169,7 +172,7 @@ export default function EventScreen(props) {
     return(
         <View style={{ flex: 1 }}>
         <LinearGradient
-            colors={['#fe7660', '#de2d73']}
+            colors={['#1E87F0', '#de2d73']}
             style={{
                 paddingTop: 30,
                 height: 80,
@@ -215,19 +218,24 @@ export default function EventScreen(props) {
                 />
             ) : <View/>}
       
-      <View style={{height:100, display: categories.length > 1 ? 'flex' : 'none'}}>
-          <ScrollView showsHorizontalScrollIndicator={false} horizontal={true} style={[styles.categories]}>
+      <View style={{height:60, display: categories.length > 1 ? 'flex' : 'none'}}>
+          <ScrollView  
+          
+            showsHorizontalScrollIndicator={false} horizontal={true} style={[styles.categories]}>
+              
               {categories.map((category,index) =>{
 
                 return(
                     <TouchableOpacity key={index} onPress={()=>{index === categoryIndex ? setcategoryIndex(-1) : setcategoryIndex(index) }}>
-                        <Text style={[styles.category,categoryIndex === index && {color:'#1E87F0',borderBottomColor:'#1E87F0'}]}>{category}</Text>
+                        <Text style={[styles.category,categoryIndex === index && {color:'#000',borderBottomColor:'#000'}]}>{category}</Text>
                     </TouchableOpacity>
                 )
               })}
           </ScrollView>
           </View>
-        <ScrollView style={{marginTop:10}}>
+        <ScrollView   refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={getData} />
+                } style={{marginTop:10}}>
             {searchResult.length === 0 ? <Text style={{width:'100%',textAlign:'center',color:'#000'}}>Ничего не найдено :(</Text> : <View></View>}
             {Array.isArray(searchResult) && searchResult !== undefined ? searchResult.map((event,index) => {
           
@@ -246,19 +254,19 @@ export default function EventScreen(props) {
 const styles = StyleSheet.create({
     categories:{
         marginTop:20,
-        marginBottom:10,
+
         flexDirection:'row',
         
         paddingHorizontal:10,
     },  
-    badge:{marginTop:10,padding:8,marginLeft:10,backgroundColor:'#fd6b53',color:'#fff',borderRadius:6,borderWidth:1,borderColor:'#fe7660',width:75,alignItems:'center',textAlign:'center'},
+    badge:{marginTop:10,padding:8,marginLeft:10,backgroundColor:'#fd6b53',color:'#fff',borderRadius:6,borderWidth:1,borderColor:'#1E87F0',width:75,alignItems:'center',textAlign:'center'},
     category:{
-        paddingVertical:10,
+      
         fontSize:13,
         marginRight:10,
         paddingBottom:8,
-        color:'#fe7660',
+        color:'#1E87F0',
         borderBottomWidth:4,
-        borderBottomColor:'#fe7660'
+        borderBottomColor:'#1E87F0'
     }
 })

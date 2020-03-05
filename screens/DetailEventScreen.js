@@ -1,10 +1,12 @@
 import React,{useEffect,useState} from 'react'
-import { StyleSheet, Text, View,Image,Dimensions } from 'react-native'
+import { StyleSheet, Text, View,Image,Dimensions,Animated } from 'react-native'
 import { Appbar,Title,Caption, Portal,Provider,Modal,Button } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView, TouchableOpacity, TextInput } from 'react-native-gesture-handler';
 import ReactNativeParallaxHeader from 'react-native-parallax-header';
 import moment from "moment";
+import { WebView } from 'react-native-webview';
+import ImageView from 'react-native-image-view';
 
 const SCREEN_HEIGHT = Dimensions.get('window').height
 const IS_IPHONE_X = SCREEN_HEIGHT === 812 || SCREEN_HEIGHT === 896;
@@ -16,9 +18,27 @@ const NAV_BAR_HEIGHT = HEADER_HEIGHT - STATUS_BAR_HEIGHT;
 export default function DetailEventScreen(props) {
     const eventData = props.route.params.event
     const [visible, setvisible] = useState(false)
+    const [isImageViewVisible, setIsImageViewVisible] = useState(false)
+    const [imageIndex, setimageIndex] = useState(0)
+    const [webViewVisible, setWebViewVisible] = useState(false)
+    const [images, setimages] = useState([])
+    const _showModal = () => {
+        if(eventData["data-tc-event"]){
+            props.navigation.navigate('Купить билет',{
+                event:eventData["data-tc-event"],
+                token: eventData["data-tc-token"],
+            })
+            
+        }else{ 
+            setvisible(true)
+        }
+        
 
-    const _showModal = () => setvisible(true);
-    const _hideModal = () => setvisible(false);
+    }
+    const _hideModal = () => {
+        setvisible(false);
+        setWebViewVisible(false)
+    }
 
     const ruTitles = {
     
@@ -80,7 +100,7 @@ export default function DetailEventScreen(props) {
     }, [])
 
 
-    renderNavBar = () => (
+    const renderNavBar = () => (
         <View style={styles.navContainer}>
           <View style={styles.statusBar} />
           <View style={styles.navBar}>
@@ -91,20 +111,19 @@ export default function DetailEventScreen(props) {
       )
 
     function renderContent() {
- 
         return (
-            <View style={{flex:1,backgroundColor:'#fff',position:'relative'}}>
-
- 
+            <View style={styles.container}>
+                   
+                
                 <ScrollView>
-             
-                    <View style={{paddingHorizontal:10,marginVertical:10}} >
+                    <Title style={{paddingTop:14,fontSize:34,fontFamily:'Roboto-Medium',}}>{eventData.name}</Title>
+                    <View style={{marginVertical:10}} >
     
                         
                         {eventData.seanses !== undefined && eventData.seanses !== null ?
                             <ScrollView showsHorizontalScrollIndicator={false} horizontal={true}>
                             {eventData.seanses.map(seans =>{
-                                return <TouchableOpacity style={{borderWidth:1,borderRadius:5,borderColor:'#f1f1f1',paddingHorizontal:6,paddingVertical:12,marginRight:5}}><Text >{seans.date}</Text></TouchableOpacity>
+                                return <TouchableOpacity onPress={_showModal} style={{borderWidth:1,borderRadius:5,borderColor:'#f1f1f1',paddingHorizontal:6,paddingVertical:12,marginRight:5}}><Text >{seans.date}</Text></TouchableOpacity>
                             })}
                         </ScrollView> : <View></View>}
                     {
@@ -113,7 +132,7 @@ export default function DetailEventScreen(props) {
                             if(value !== null && value !== "")
                                 return(
                                     <View key={key}>
-                                        <Caption>{key}</Caption>
+                                        <Caption style={styles.caption}>{key}</Caption>
                                         <Title style={styles.title}>{value}</Title>
                                     </View>
                                 )
@@ -121,23 +140,41 @@ export default function DetailEventScreen(props) {
                     
                     }
                     {console.log(Array.isArray(eventData.gallery))}
-                    {Array.isArray(eventData.gallery) ? 
+                    {Array.isArray(eventData.gallery) &&
                     <View>
-                        <Title style={styles.title}>Фотогаллерея</Title>
+                        <Caption style={[styles.caption,{marginBottom:10}]}>Фотогаллерея</Caption>
                         <ScrollView showsHorizontalScrollIndicator={false} horizontal={true}>
-                        
-                            {eventData.gallery.map(item =>{
+                            
+                            {eventData.gallery.map((item,index) =>{
+                                images.push({source:{
+                                    uri:item
+                                }})
                                 return(
-                                    <TouchableOpacity>
-                                <Image style={{width:150,height:200,marginRight:10,borderRadius:10}}     
+                                <TouchableOpacity key={item}
+                                onPress={() => {      
+                                    setimageIndex(index)
+                                    setIsImageViewVisible(true)
+                                }}>
+                                <Image style={styles.image}     
                                 source={{
                                 uri: item}} />
                                 </TouchableOpacity>
                                 )
                             })}
-                        </ScrollView></View> : <View></View>
-    
-                        }
+                        </ScrollView>
+                        <ImageView
+                            glideAlways
+                            images={images}
+                            imageIndex={imageIndex}
+                            animationType="fade"
+                            isVisible={isImageViewVisible}
+                            onClose={() => setIsImageViewVisible(false)}
+                            onImageChange={index => {
+                                console.log(index);
+                            }}
+                        />
+                        
+                        </View>}
                     
                     </View>
                    
@@ -172,21 +209,22 @@ export default function DetailEventScreen(props) {
     return (
         <Provider style={styles.container}>
 
-            <View style={{display:Platform.OS === 'ios' ? 'none' : 'flex', height:30,backgroundColor:'#fe7660'}}></View>
+            <View style={{display:Platform.OS === 'ios' ? 'none' : 'flex', height:30,backgroundColor:'#1E87F0'}}></View>
             <ReactNativeParallaxHeader
             headerMinHeight={HEADER_HEIGHT}
             headerMaxHeight={250}
             alwaysShowTitle={false}
             
             extraScrollHeight={20}
-            navbarColor={'#fe7660'}
+            navbarColor={'#1E87F0'}
             title={
             <View style={{backgroundColor:'#0000004d',flex:1,height:'100%',width:'100%',alignItems:'flex-end',paddingVertical:25,paddingHorizontal:15,flexDirection:'row'}}>
               <View style={{flexDirection:"row"}}>
                 <View style={styles.circle}></View>
-                <Text style={styles.eventTitle}>{typeof eventData.type_afisha === "number" && eventData.type_afisha ?  eventData.type_afisha.name :  afisha_type[eventData.type_afisha] !== undefined ? afisha_type[eventData.type_afisha] : eventData.type_afisha}</Text>
+                    <Text style={styles.eventTitle}>{ eventData.type_afisha && eventData.type_afisha.name && eventData.type_afisha.name}</Text>
                 </View>
-            </View>}
+            </View>
+            }
             renderNavBar={renderNavBar}
             backgroundImage={img}
             backgroundImageScale={1.2}
@@ -203,19 +241,25 @@ export default function DetailEventScreen(props) {
                    
                     <View style={styles.modal}>
                         <Title>{eventData.name}</Title>
-                        <Caption>Цена</Caption>
+                        <Caption style={styles.caption}>Цена</Caption>
                         <Text>{eventData.price}</Text>
 
-                        <Caption>Номер телефона</Caption>
+                        <Caption style={styles.caption}>Номер телефона</Caption>
                         <TextInput placeholder=""></TextInput>
-                        <Caption>Email</Caption>
+                        <Caption style={styles.caption}>Email</Caption>
                         <TextInput placeholder=""></TextInput>
-                        <Caption>Telegram</Caption>
+                        <Caption style={styles.caption}>Telegram</Caption>
                         <TextInput placeholder=""></TextInput>
                         <Button onPress={_hideModal} style={{marginVertical:10}}>Отправить</Button>
                     </View>
                 </Modal>
+                <Modal visible={webViewVisible} onDismiss={_hideModal}>
+               </Modal>
+               
             </Portal>
+            
+
+            
        
         </Provider>
         );
@@ -227,12 +271,17 @@ export default function DetailEventScreen(props) {
 const styles = StyleSheet.create({
     container:{
         flex:1,
-        position:'relative'
+        position:'relative',
+        paddingHorizontal:24,
     },
     title:{
+        fontFamily:'Roboto-Thin',
         fontSize:14,
+        letterSpacing:0.5,
+        lineHeight:16,
     },
     modal:{
+        flex:1,
         paddingVertical:10,
         paddingHorizontal:20,
         backgroundColor:'#fff'
@@ -240,6 +289,12 @@ const styles = StyleSheet.create({
     buyButtonOpacity:{
         width:'100%',
         height:'100%'
+    },
+    caption:{
+        marginTop:10,
+        fontFamily:'Roboto-Regular',
+        textTransform:'uppercase',
+
     },
     buyButton:{
         alignSelf:'center',
@@ -253,8 +308,8 @@ const styles = StyleSheet.create({
         borderRadius:8,
         alignItems:'center',
         textAlign:'center',
-        backgroundColor:'#55b9f3',
-        shadowColor: "#55b9f3",
+        backgroundColor:'#1E87F0',
+        shadowColor: "#1E87F0",
         shadowOffset: {
             width: 0,
             height: 2,
@@ -263,6 +318,7 @@ const styles = StyleSheet.create({
         shadowRadius: 3.84,
         elevation: 7,
     },  
+    image:{width:150,height:200,marginRight:10,borderRadius:10},
     circle:{
         marginRight:10,
         alignSelf:'center',
@@ -274,9 +330,14 @@ const styles = StyleSheet.create({
         borderWidth:3
     },  
     eventTitle:{
+        fontFamily:'Roboto-Thin',
+        fontSize:12,
+        letterSpacing:0.5,
+        lineHeight:16,
+        textTransform:'uppercase',
         alignSelf:'center',
         color:'#fff',
-        fontWeight:"200"
+        
     },  
     navContainer: {
         height: HEADER_HEIGHT,
@@ -296,4 +357,10 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         fontSize: 18,
       },
+      absoluteFill:{
+          height:'100%',
+          width:'100%',
+          flex:1,
+          position:'absolute'
+      }
 })

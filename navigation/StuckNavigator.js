@@ -5,6 +5,8 @@ import DetailEventScreen from "../screens/DetailEventScreen"
 import { createStackNavigator } from "@react-navigation/stack";
 import { BottomNavigation, Text, Appbar } from "react-native-paper";
 import EventScreen from "../screens/EventScreen"
+import BuyTicketScreen from "../screens/BuyTicketScreen"
+
 
 
 const Stack = createStackNavigator();
@@ -40,6 +42,14 @@ export default function StuckNavigator(props) {
             {...props}
             component={EventScreen}
           />
+            <Stack.Screen
+          
+
+            name="Купить билет"
+            {...props}
+            component={BuyTicketScreen}
+          />
+          
       </Stack.Navigator>
            
       

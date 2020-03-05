@@ -28,7 +28,7 @@ export default function HomeScreen(props) {
     "https://www.museum-noyabrsk.ru/uploads/banner/tajny-morya.jpg" // Network image
     // Local image
   ]);
-
+  let oldDate = ''
   const [categories, setcategories] = useState([
     {
       title:'Афиша',
@@ -138,7 +138,7 @@ export default function HomeScreen(props) {
   return (
     <View style={{ flex: 1 }}>
       <LinearGradient
-          colors={['#fe7660', '#de2d73']}
+          colors={['#1E87F0', '#1E87F0']}
           style={{
               paddingTop: 30,
               height: 80,
@@ -193,7 +193,7 @@ export default function HomeScreen(props) {
               return(
                 <TouchableOpacity onPress={() =>{
                   setCategoryIndex(index)
-                }} style={[styles.category,{backgroundColor: categoryIndex === index ? '#fe7660' : '#f7f7f7'}]}>             
+                }} style={[styles.category,{backgroundColor: categoryIndex === index ? '#1E87F0' : '#f7f7f7'}]}>             
                 <Text style={[styles.categoryText,{color:categoryIndex === index ? '#fff' : '#000'}]}> {category.title} </Text>
               </TouchableOpacity>
               )
@@ -203,8 +203,16 @@ export default function HomeScreen(props) {
         </View>
     
         {Array.isArray(events) && events !== undefined ? events.map((event,index) => {
-          if(index < 3){
-            return <EventCard key={event.title} event={event} {...props} />;
+          oldDate = date ? date : ''
+          let date = event.seanses && moment(event.seanses[0].date).format('D MMMM')
+          if(index < 5){
+            return (
+              <View>
+                
+                {events[index - 1] ? date !== moment(events[index - 1].date).format('D MMMM') && <Text></Text> : <Text>{date}</Text>}
+                <EventCard key={event.title} event={event} {...props} />
+              </View>
+            );
           }
         }):<View></View>}
     <Animated.View                 // Special animatable View
@@ -213,7 +221,7 @@ export default function HomeScreen(props) {
                 // Bind opacity to animated value
       }}
     >
-      <Button color="#fe7660" onPress={() =>{props.navigation.navigate('EventScreen',{...categories[categoryIndex]})}}>Перейти в раздел</Button>
+      <Button color="#1E87F0" onPress={() =>{props.navigation.navigate('EventScreen',{...categories[categoryIndex]})}}>Перейти в раздел</Button>
     </Animated.View>
        
       </ScrollView>
@@ -239,6 +247,7 @@ const styles = StyleSheet.create({
     fontSize: 12
   },
   categoryText: {
+    fontFamily:'Roboto-Regular',
     fontSize: 11
   }
 });
