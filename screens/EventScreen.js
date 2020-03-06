@@ -13,7 +13,7 @@ import {
 import { SliderBox } from "react-native-image-slider-box";
 import moment from "moment";
 import EventCard from "../components/EventCard";
-import { Appbar, Button } from "react-native-paper";
+import { Appbar, Button,FAB, Portal, Provider } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Fuse from 'fuse.js'
@@ -25,22 +25,48 @@ export default function EventScreen(props) {
     const [showDateBadge, setShowDateBadge] = useState(false)
     const [searchResult,setSearchResult] = useState([])
     const [dates, setdates] = useState([])
+    const [openFAB, setopenFAB] = useState(false)
     const [refreshing, setRefreshing] = useState(false);
     const [fadeAnim,setFadeAnim] = useState(new Animated.Value(0))
     const [categoryIndex, setcategoryIndex] = useState(-1)
     const [date, setDate] = useState(new Date(moment(new Date()).add(-1,'days')));
     const [mode, setMode] = useState('date');
     const [show, setShow] = useState(false);
+    const [FABactions, setFABactions] = useState([])
+    let oldDate 
     
+
+    useEffect(() => {
+        getData()
+        getDates()
+    }, []);
+
+    async function filterByDate(all_events) {
+        let seansesByDate = []
+        all_events.map(event =>{
+          if(event.seanses){
+            event.seanses.map(seans =>{
+              seansesByDate.push({
+                ...event,
+                date:seans.date
+              })
+            })
+          }
+        })
+        seansesByDate.sort((a, b) => (a.date > b.date) ? 1 : -1)
+        return seansesByDate.length > 0 ? seansesByDate : all_events;
+    }
 
     const searchSeanses = (date) =>{
         setShow(false)
         let available_seanses = []
-        events.forEach(event =>{
+        searchResult.forEach(event =>{
             event.seanses.forEach(seans =>{
-                console.log(moment(seans.date).format("DD/MM") , moment(date).format("DD/MM"))
                 if(moment(seans.date).format("DD/MM") === moment(date).format("DD/MM")  ){
-                    available_seanses.push(event)
+                    available_seanses.push({
+                        ...event,
+                        date: date
+                    })
                 }
             })
         })
@@ -119,12 +145,9 @@ export default function EventScreen(props) {
         "33":"Магниты",
         "34":"Сувенирные монеты",
         "35":"Текстильные куклы",
-        "36":"Упаковка подарков и сувениров "}
-    useEffect(() => {
-        getData()
-        getDates()
+        "36":"Упаковка подарков и сувениров "
+    }
 
-    }, []);
 
     function getDates(){
         let dates = []
@@ -142,35 +165,49 @@ export default function EventScreen(props) {
 
     function getData() {
         setcategoryIndex(-1)
-        fetchData(props.route.params.url)
+        let temp_FABactions = []
+        fetchData(props.route.params.url).then((cat) => {
+            cat.map((category,index) =>{
+                temp_FABactions.push({ icon: 'shape', label: category, onPress:()=>{index === categoryIndex ? setcategoryIndex(-1) : setcategoryIndex(index) }})
+            })
+            setFABactions(temp_FABactions)
+        })
+    
+        
     }
     async function fetchData(url) {
+        setRefreshing(true);
+        let result = await fetch(url,{  headers: {
+            "Cache-Control": "no-cache",
+            "Content-Type": "application/json",
+            Pragma: "no-cache"
+        }}).then(res =>
+            res.json().then(response => {
+            setRefreshing(false);
+            filterByDate(response).then((filteredData) => {
+                setEvents(filteredData)
+                setSearchResult(filteredData)
+            })
+          
+            let types = []
+            
+            response.forEach(element => {
+                element.type_afisha && types.push(element.type_afisha.name)
+            });
+            setFadeAnim(new Animated.Value(0))
+            
+            setcategories(types.filter(onlyUnique))
+            return types.filter(onlyUnique)
 
-
-    setRefreshing(true);
-    fetch(url,{  headers: {
-        "Cache-Control": "no-cache",
-        "Content-Type": "application/json",
-        Pragma: "no-cache"
-    }}).then(res =>
-        res.json().then(response => {
-        setRefreshing(false);
-        setEvents(response)
-        setSearchResult(response)
-        let types = []
-        
-        response.forEach(element => {
-            console.log(element.type_afisha)
-            element.type_afisha && types.push(element.type_afisha.name)
-        });
-        setFadeAnim(new Animated.Value(0))
-        
-        setcategories(types.filter( onlyUnique))
+            })
+        ).catch(e =>{
+          setRefreshing(false)
         })
-    )
+
+        return result
     }
     return(
-        <View style={{ flex: 1 }}>
+        <Provider style={{ flex: 1 }}>
         <LinearGradient
             colors={['#1E87F0', '#de2d73']}
             style={{
@@ -199,7 +236,7 @@ export default function EventScreen(props) {
         
         <TouchableOpacity  onPress={()=>{setShowDateBadge(false);setSearchResult(events)}} style={{display:showDateBadge ? "flex" : "none"}}>
             <Text style={styles.badge}>
-                {moment(date).format("DD/MM")}
+                {moment(date).format("D MMMM")}
             </Text>
         </TouchableOpacity>
    
@@ -218,35 +255,44 @@ export default function EventScreen(props) {
                 />
             ) : <View/>}
       
-      <View style={{height:60, display: categories.length > 1 ? 'flex' : 'none'}}>
-          <ScrollView  
-          
-            showsHorizontalScrollIndicator={false} horizontal={true} style={[styles.categories]}>
-              
-              {categories.map((category,index) =>{
 
-                return(
-                    <TouchableOpacity key={index} onPress={()=>{index === categoryIndex ? setcategoryIndex(-1) : setcategoryIndex(index) }}>
-                        <Text style={[styles.category,categoryIndex === index && {color:'#000',borderBottomColor:'#000'}]}>{category}</Text>
-                    </TouchableOpacity>
-                )
-              })}
-          </ScrollView>
-          </View>
         <ScrollView   refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={getData} />
                 } style={{marginTop:10}}>
             {searchResult.length === 0 ? <Text style={{width:'100%',textAlign:'center',color:'#000'}}>Ничего не найдено :(</Text> : <View></View>}
             {Array.isArray(searchResult) && searchResult !== undefined ? searchResult.map((event,index) => {
-          
-                return <EventCard key={event.title} event={event} {...props} />;
+                   
+                let date = event.date && event.date
+                console.log(event.date)
+                return(
+                   
+                <View>
+                    {event.date ? searchResult[index - 1] ? moment(date).format('MM/DD') !== moment(searchResult[index - 1].date).format('MM/DD') && <Text style={styles.title}>{moment(date).format('D MMMM')}</Text> : <Text style={styles.title}>{moment(date).format('D MMMM')}</Text>: <View/>}
+                    <EventCard key={event.title} event={event} {...props} />
+                </View>
+              );
+              
           
             }):<View></View>}
         </ScrollView>
-        
+        <Portal>
+           <FAB.Group
+             open={openFAB}
+             icon={openFAB ? 'close' : 'filter'}
+             actions={FABactions}
+             color="#fff"
+             fabStyle={{backgroundColor:'#1E87F0'}}
+             onStateChange={({open}) => setopenFAB(open)}
+             onPress={() => {
+               if (openFAB) {
+                 // do something if the speed dial is open
+               }
+             }}
+           />
+         </Portal>
         
 
-        </View>
+        </Provider>
     )
 }
 
@@ -258,8 +304,13 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         
         paddingHorizontal:10,
-    },  
-    badge:{marginTop:10,padding:8,marginLeft:10,backgroundColor:'#fd6b53',color:'#fff',borderRadius:6,borderWidth:1,borderColor:'#1E87F0',width:75,alignItems:'center',textAlign:'center'},
+    }, 
+    title:{
+        fontFamily:'Roboto-Medium',
+        fontSize:16,
+        padding:10,
+      }, 
+    badge:{marginTop:10,padding:8,marginLeft:10,backgroundColor:'#1E87F0',color:'#fff',borderRadius:6,borderWidth:1,borderColor:'#1E87F0',width:75,alignItems:'center',textAlign:'center'},
     category:{
       
         fontSize:13,

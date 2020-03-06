@@ -7,6 +7,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  Dimensions,
   RefreshControl
 } from "react-native";
 import { SliderBox } from "react-native-image-slider-box";
@@ -14,50 +15,54 @@ import moment from "moment";
 import EventCard from "../components/EventCard";
 import { Appbar, Button } from "react-native-paper";
 import { LinearGradient } from "expo-linear-gradient";
+import EventScreen from '../screens/EventScreen'
+const deviceWidth = Dimensions.get("window").width;
+
 
 export default function HomeScreen(props) {
   const [events, setEvents] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
   const [categoryIndex,setCategoryIndex] = useState(0)
   const [wait, setwait] = useState(false)
+  const [currentOffset, setcurrentOffset] = useState(0)
+  const [categoryOffset, setcategoryOffset] = useState(0)
+  const [scrollState, setscrollState] = useState(false)
+  const [categoryScrollState, setcategoryScrollState] = useState(false)
   const [fadeAnim,setFadeAnim] = useState(new Animated.Value(0))
   const [images, setImages] = useState([
-    "https://www.museum-noyabrsk.ru/uploads/banner/art-mart_banner.jpg",
-    "https://www.museum-noyabrsk.ru/uploads/banner/multiproekt-pobedavmestenoyabrsk_2020_banner.jpg",
-    "https://www.museum-noyabrsk.ru/uploads/banner/yamal-kraj-zemli.-nachalo-zhizni_banner.jpg",
-    "https://www.museum-noyabrsk.ru/uploads/banner/tajny-morya.jpg" // Network image
-    // Local image
+    "https://digitalsynopsis.com/wp-content/uploads/2017/07/beautiful-color-ui-gradients-backgrounds-endless-river.png"
   ]);
   let oldDate = ''
+  const banersUrl = 'https://museum-noyabrsk.ru/platforms/themes/blankslate/adv.json'
   const [categories, setcategories] = useState([
     {
       title:'Афиша',
-      url:"http://museum.binarywd.com/platforms/themes/blankslate/afisha.json",
+      url:"https://museum-noyabrsk.ru/platforms/themes/blankslate/afisha.json",
       items: []
     },
     {
       title:'Выставки',
-      url:"http://museum.binarywd.com/platforms/themes/blankslate/exhibitions.json",
+      url:"https://museum-noyabrsk.ru/platforms/themes/blankslate/exhibitions.json",
       items: []
     },
     {
       title:'Коллекции',
-      url:"http://museum.binarywd.com/platforms/themes/blankslate/collections.json",
+      url:"https://museum-noyabrsk.ru/platforms/themes/blankslate/collections.json",
       items: []
     },
     {
       title:'Услуги',
-      url:"http://museum.binarywd.com/platforms/themes/blankslate/uslugi.json",
+      url:"https://museum-noyabrsk.ru/platforms/themes/blankslate/uslugi.json",
       items: []
     },
     {
-      title:'Магазин',
-      url:"http://museum.binarywd.com/platforms/themes/blankslate/shop.json",
+      title:'Сувениры',
+      url:"https://museum-noyabrsk.ru/platforms/themes/blankslate/shop.json",
       items: []
     },
     {
       title:'Новости',
-      url:"http://museum.binarywd.com/platforms/themes/blankslate/news.json",
+      url:"https://museum-noyabrsk.ru/platforms/themes/blankslate/news.json",
       items: []
     },
   ])
@@ -99,35 +104,77 @@ export default function HomeScreen(props) {
 
 
   useEffect(() => {
-    
+    getData()
   }, []);
 
+  useEffect(() => {
+    //getData()
+    if (scrollState && categoryScrollState){
+      scrollState.scrollTo({
+        x: deviceWidth * categoryIndex,
+        y: 0,
+        animated: false
+      });
+      categoryScrollState.scrollTo({
+        x: 100*categoryIndex  - (deviceWidth/2-90),
+        y: 0,
+        animated: true
+      });
+    }
+
+      
+  }, [categoryIndex])
+
   function getData() {
-    fetchData(categoryIndex)
+  
+    fetch(banersUrl).then(response => response.json().then(json=>{
+      let temp_images = []
+      json.map(baner =>{
+        temp_images.push(baner.img)
+      })
+      setImages(temp_images)
+    }))
+
+    for(let i = 0; i < categories.length ; i ++){
+      fetchData(i)
+    }
     
+  }
+
+  
+
+  async function filterByDate(all_events) {
+    let seansesByDate = []
+    all_events.map(event =>{
+      if(event.seanses){
+        event.seanses.map(seans =>{
+          seansesByDate.push({
+            ...event,
+            date:seans.date
+          })
+        })
+      }
+    })
+    seansesByDate.sort((a, b) => (a.date > b.date) ? 1 : -1)
+    return seansesByDate.length > 0 ? seansesByDate : all_events;
   }
 
   async function fetchData(cat_index) {
-
-    
-  setRefreshing(true);
-  let result = await fetch(categories[cat_index].url,{  headers: {
-    "Cache-Control": "no-cache",
-    "Content-Type": "application/json",
-    Pragma: "no-cache"
-  }}).then(res =>
-    res.json().then(response => {
-      setRefreshing(false);
-      
-      setEvents(response)
-      setFadeAnim(new Animated.Value(0))
+    setRefreshing(true);
+    let result = await fetch(categories[cat_index].url,{  headers: {
+      "Cache-Control": "no-cache",
+      "Content-Type": "application/json",
+      Pragma: "no-cache"
+    }}).then(res =>
+      res.json().then(response => {
+        setRefreshing(false);
+        events[cat_index] = (response)
+        setFadeAnim(new Animated.Value(0))
+      })
+    ).catch(e => {
+      setRefreshing(false)
     })
-  )
   }
-
-  useEffect(() => {
-    getData()
-  }, [categoryIndex])
 
   const isCloseToBottom = ({layoutMeasurement, contentOffset, contentSize}) => {
     const paddingToBottom = 20;
@@ -184,6 +231,7 @@ export default function HomeScreen(props) {
           style={{ height: 50, justifyContent: "center", marginVertical: 10 }}
         >
           <ScrollView
+            ref = {setcategoryScrollState}
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ justifyContent: "center" }}
             horizontal={true}
@@ -191,9 +239,9 @@ export default function HomeScreen(props) {
           >
             {categories.map((category,index) =>{
               return(
-                <TouchableOpacity onPress={() =>{
+                <TouchableOpacity key={index} onPress={() =>{
                   setCategoryIndex(index)
-                }} style={[styles.category,{backgroundColor: categoryIndex === index ? '#1E87F0' : '#f7f7f7'}]}>             
+                }} style={[styles.category,{backgroundColor: categoryIndex === index ? '#1E87F0' : '#fff'}]}>             
                 <Text style={[styles.categoryText,{color:categoryIndex === index ? '#fff' : '#000'}]}> {category.title} </Text>
               </TouchableOpacity>
               )
@@ -201,30 +249,40 @@ export default function HomeScreen(props) {
 
           </ScrollView>
         </View>
-    
-        {Array.isArray(events) && events !== undefined ? events.map((event,index) => {
-          oldDate = date ? date : ''
-          let date = event.seanses && moment(event.seanses[0].date).format('D MMMM')
-          if(index < 5){
-            return (
-              <View>
+        <ScrollView onScroll={event => {
+          let offset = Math.round(
+            event.nativeEvent.contentOffset.x / deviceWidth
+          )
+          offset !== categoryIndex && setCategoryIndex(offset) 
+
+        }} ref={setscrollState} showsHorizontalScrollIndicator={false} pagingEnabled={true}  horizontal={true}>
+          
+          {events.map((tab,index) =>{
+            return(
+              <ScrollView key={index} style={{}}>
+                {Array.isArray(tab) && tab !== undefined ? tab.map((event,index) => {
+                  oldDate = date ? date : ''
+                  let date = event.date && moment(event.date).format('D MMMM')
+                    if(index < 5){
+                      return (
+                        <View>
+                          {event.date !== undefined ? events[index - 1] ? date !== moment(events[index - 1].date).format('D MMMM') && <Text style={styles.title}>{date}</Text> : <Text style={styles.title}>{date}</Text>: <View/>}
+                          <EventCard key={event.title} event={event} {...props} />
+                        </View>
+                      );
+                  }
                 
-                {events[index - 1] ? date !== moment(events[index - 1].date).format('D MMMM') && <Text></Text> : <Text>{date}</Text>}
-                <EventCard key={event.title} event={event} {...props} />
-              </View>
-            );
-          }
-        }):<View></View>}
-    <Animated.View                 // Special animatable View
-      style={{
-        ...props.style,
-                // Bind opacity to animated value
-      }}
-    >
-      <Button color="#1E87F0" onPress={() =>{props.navigation.navigate('EventScreen',{...categories[categoryIndex]})}}>Перейти в раздел</Button>
-    </Animated.View>
-       
-      </ScrollView>
+                }):<View></View>}
+              </ScrollView>
+            )
+          })}
+        </ScrollView>
+    </ScrollView>
+    <View style={styles.detailCategory}>
+      <Button style={{
+                      backgroundColor:'#1E87F0',
+                     }} color="#fff" onPress={() =>{props.navigation.navigate('EventScreen',{...categories[categoryIndex]})}}>Перейти в раздел</Button>
+    </View>
     </View>
   );
 }
@@ -234,6 +292,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f7f7f7"
   },
+  title:{
+    fontFamily:'Roboto-Medium',
+    fontSize:16,
+    padding:10,
+  },
+  detailCategory:{
+   
+    position:'absolute',
+    zIndex:999,
+    bottom:20,
+    width:'100%',
+    alignItems:'center'
+  },
   category: {
     width: 100,
     height: 40,
@@ -242,12 +313,13 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
     paddingHorizontal: 16,
     borderColor:'#e0e0e0',
-    borderWidth:1,
+    elevation: 1,
     borderRadius: 6,
-    fontSize: 12
+    fontSize: 12,
+    backgroundColor:'#fff'
   },
   categoryText: {
-    fontFamily:'Roboto-Regular',
+    fontFamily:'Roboto-Medium',
     fontSize: 11
   }
 });

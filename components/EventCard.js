@@ -1,5 +1,5 @@
 import React,{useState} from 'react';
-import { StyleSheet, Text, View,TouchableOpacity,Image } from 'react-native';
+import { StyleSheet, Text, View,TouchableOpacity,Image,Dimensions } from 'react-native';
 import { SliderBox } from "react-native-image-slider-box";
 import {Title,Caption,Appbar, Headline} from "react-native-paper";
 import moment from "moment";
@@ -51,29 +51,29 @@ export default function EventCard(props) {
     "36":"Упаковка подарков и сувениров "}
   const eventData = props.event
   return (
-    <View>
+    <View style={[styles.container]}>
       <TouchableOpacity onPress={() =>{
           props.navigation.navigate("DetailEventScreen",{event:props.event})
-          }} style={[styles.container]}>
+          }} style={styles.touchableContainer}>
           <View >
-          <Image
-          style={[styles.image]}
-          source={{
-          uri: eventData.baner ? eventData.baner.url : eventData.img ? eventData.img !== "" ? eventData.img : "https://picsum.photos/300/300" : "https://picsum.photos/200/300",
-          }}
-          
-          />
-          {eventData.seanses != undefined ? <Text style={styles.badge}>до {moment(eventData.seanses[eventData.seanses.length -1].date).locale("ru", localization).format("D MMMM")}</Text> : eventData.price != undefined ? <Text style={[eventData.price.length > 10 ? styles.topBadge : styles.badge]}>{eventData.price}</Text> :  false}
-          </View>
-          <View style={[styles.infoContainer]}>
-    <Text style={styles.tag}>{eventData.type_afisha  ?  eventData.type_afisha.name :  afisha_type[eventData.type_afisha] !== undefined ? afisha_type[eventData.type_afisha] : eventData.type_afisha}</Text>
-    <Text style={styles.title}>{unicodeToChar(eventData.name)}</Text>
-    <Text style={styles.caption}>{eventData.seanses != undefined && eventData.seanses.length > 0 ? moment(eventData.seanses[0].date).format('D MMMM Y') : moment(eventData.date).format("D MMMM Y")}</Text>
-    </View>
-    
-    
-    
-    </TouchableOpacity>
+            <Image
+            style={[styles.image]}
+            source={{
+            uri: eventData.baner ? eventData.baner.url : eventData.img ? eventData.img !== "" ? eventData.img : "https://picsum.photos/300/300" : "https://picsum.photos/200/300",
+            }}
+            
+            />
+            {eventData.seanses != undefined ? <Text style={styles.badge}>до {moment(eventData.seanses[eventData.seanses.length -1].date).locale("ru", localization).format("D MMMM")}</Text> : eventData.price != undefined ? <Text style={[eventData.price.length > 10 ? styles.topBadge : styles.badge]}>{eventData.price}</Text> :  false}
+            </View>
+            <View style={[styles.infoContainer]}>
+          <Text style={styles.tag}>{eventData.type_afisha  ?  eventData.type_afisha.name :  afisha_type[eventData.type_afisha] !== undefined ? afisha_type[eventData.type_afisha] : eventData.type_afisha}</Text>
+          <Text style={styles.title}>{unicodeToChar(eventData.name)}</Text>
+          <Text style={styles.caption}>{eventData.date && moment(eventData.date).format("D MMMM Y HH:mm")}</Text>
+        </View>
+        
+        
+        
+      </TouchableOpacity>
     </View>
     
 
@@ -82,15 +82,20 @@ export default function EventCard(props) {
 
 const styles = StyleSheet.create({
   container: {
-    marginHorizontal:10,
-    backgroundColor:'#fff',
-    borderRadius:6,
-    elevation:3,
+    width: Math.round(Dimensions.get('window').width),
     marginBottom:16,
-    flexDirection:'row',
+    paddingHorizontal:10,
     
     
   },
+  touchableContainer:{
+    backgroundColor:'#fff',
+    borderRadius:6,
+    elevation:3,
+    flexDirection:'row',
+    width:'100%',
+  },
+
   caption:{
     fontFamily: 'Roboto-Regular',
     fontStyle: 'normal',

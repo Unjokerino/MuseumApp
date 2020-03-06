@@ -24,13 +24,15 @@ export default function DetailEventScreen(props) {
     const [images, setimages] = useState([])
     const _showModal = () => {
         if(eventData["data-tc-event"]){
+            if(eventData["data-tc-token"]){
             props.navigation.navigate('Купить билет',{
                 event:eventData["data-tc-event"],
                 token: eventData["data-tc-token"],
             })
+            }else{
+                setvisible(true)
+            }
             
-        }else{ 
-            setvisible(true)
         }
         
 
@@ -116,14 +118,12 @@ export default function DetailEventScreen(props) {
                    
                 
                 <ScrollView>
-                    <Title style={{paddingTop:14,fontSize:34,fontFamily:'Roboto-Medium',}}>{eventData.name}</Title>
+                    <Title style={{paddingTop:14,fontSize:34,fontFamily:'Roboto-Medium'}}>{eventData.name}</Title>
                     <View style={{marginVertical:10}} >
-    
-                        
                         {eventData.seanses !== undefined && eventData.seanses !== null ?
                             <ScrollView showsHorizontalScrollIndicator={false} horizontal={true}>
                             {eventData.seanses.map(seans =>{
-                                return <TouchableOpacity onPress={_showModal} style={{borderWidth:1,borderRadius:5,borderColor:'#f1f1f1',paddingHorizontal:6,paddingVertical:12,marginRight:5}}><Text >{seans.date}</Text></TouchableOpacity>
+                                return <TouchableOpacity onPress={_showModal} style={{borderWidth:1,borderRadius:5,borderColor:'#f1f1f1',paddingHorizontal:6,paddingVertical:12,marginRight:5}}><Text >{moment(seans.date).format('D MMMM HH:mm')}</Text></TouchableOpacity>
                             })}
                         </ScrollView> : <View></View>}
                     {
@@ -205,36 +205,43 @@ export default function DetailEventScreen(props) {
         })
         return current_attrs
     }
-    const img = {uri: eventData.img ? eventData.img !== "" ? eventData.img : "https://picsum.photos/700/700" : eventData.baner ?  eventData.baner.url : "https://picsum.photos/700/700"}
+    const img = {uri: eventData.img ? eventData.img !== "" ? eventData.img : "https://picsum.photos/700/700" : "https://picsum.photos/700/700"}
     return (
         <Provider style={styles.container}>
 
             <View style={{display:Platform.OS === 'ios' ? 'none' : 'flex', height:30,backgroundColor:'#1E87F0'}}></View>
-            <ReactNativeParallaxHeader
-            headerMinHeight={HEADER_HEIGHT}
-            headerMaxHeight={250}
-            alwaysShowTitle={false}
-            
-            extraScrollHeight={20}
-            navbarColor={'#1E87F0'}
-            title={
-            <View style={{backgroundColor:'#0000004d',flex:1,height:'100%',width:'100%',alignItems:'flex-end',paddingVertical:25,paddingHorizontal:15,flexDirection:'row'}}>
-              <View style={{flexDirection:"row"}}>
-                <View style={styles.circle}></View>
-                    <Text style={styles.eventTitle}>{ eventData.type_afisha && eventData.type_afisha.name && eventData.type_afisha.name}</Text>
-                </View>
-            </View>
-            }
-            renderNavBar={renderNavBar}
-            backgroundImage={img}
-            backgroundImageScale={1.2}
-            renderContent={renderContent}
-            containerStyle={{ flex: 1 }}
-            contentContainerStyle={{ flexGrow: 1 }}
-            innerContainerStyle={{ flex: 1 }}
+                <ReactNativeParallaxHeader
+                headerMinHeight={HEADER_HEIGHT}
+                headerMaxHeight={250}
+                alwaysShowTitle={false}
+                
+                extraScrollHeight={20}
+                navbarColor={'#1E87F0'}
+                title={
+                    <View style={{backgroundColor:'#0000004d',flex:1,height:'100%',width:'100%',alignItems:'flex-end',paddingVertical:25,paddingHorizontal:15,flexDirection:'row'}}>
+                        <View style={{flexDirection:"row"}}>
+                        <View style={styles.circle}></View>
+                            <Text style={styles.eventTitle}>{ eventData.type_afisha && eventData.type_afisha.name && eventData.type_afisha.name}</Text>
+                        </View>
+                    </View>
+                }
+                renderNavBar={renderNavBar}
+                backgroundImage={img}
+                backgroundImageScale={1.2}
+                renderContent={renderContent}
+                containerStyle={{ flex: 1 }}
+                contentContainerStyle={{ flexGrow: 1 }}
+                innerContainerStyle={{ flex: 1 }}
 
-            />
-            {eventData.price && <View style={styles.buyButton}><TouchableOpacity  onPress={_showModal} style={styles.buyButtonOpacity}><Text style={{color:'#fff',fontSize:16}}>Купить</Text></TouchableOpacity></View>}
+                />
+
+            {eventData["data-tc-event"] ?
+                <View style={[styles.buyButton,!eventData["data-tc-event"] && {backgroundColor:'#f1f1f1'}]}>
+                    <TouchableOpacity  onPress={_showModal} style={[styles.buyButtonOpacity,!eventData["data-tc-event"] && {backgroundColor:'#f1f1f1'}]}>
+                        <Text style={{color:'#fff',fontSize:16}}>Купить</Text>
+                    </TouchableOpacity>
+                </View>
+             : <View/>}
           
             <Portal>
                 <Modal visible={visible} onDismiss={_hideModal}>
@@ -275,8 +282,9 @@ const styles = StyleSheet.create({
         paddingHorizontal:24,
     },
     title:{
-        fontFamily:'Roboto-Thin',
+        fontFamily:'Roboto-Regular',
         fontSize:14,
+        fontWeight:'200',
         letterSpacing:0.5,
         lineHeight:16,
     },
