@@ -52,11 +52,17 @@ const categories =[
 
 function CustomDrawerContent(props) {
   return (
-    <DrawerContentScrollView {...props}>
+    <DrawerContentScrollView  {...props}>
+            <Image source={require("../assets/images/logoRound.png")} style={{alignSelf:'center',marginTop:10,width:100,height:100,marginBottom:10}}/>
+
       <DrawerItemList {...props} />
       {categories.map(category =>{
         return(
           <DrawerItem
+          inactiveBackgroundColor="#0c3961"
+          inactiveTintColor="#fff"
+          activeTintColor="#fff"
+          style={{color:'#fff'}}
           label={category.title}
           onPress={() => props.navigation.navigate('EventScreen',{
           url:category.url,
@@ -65,7 +71,6 @@ function CustomDrawerContent(props) {
         />
         )
       })}
-      <Image source={require("../assets/images/icon.png")} style={{alignSelf:'center',marginTop:10,width:100,height:100}}/>
     </DrawerContentScrollView>
   );
 }
@@ -74,19 +79,23 @@ function App() {
   return (
     <NavigationContainer>
       <Drawer.Navigator
+      
+      
+      backgroundColor="#000"
       drawerContent={props => CustomDrawerContent(props)}
         drawerPosition="right"
         drawerContentOptions={{
-          activeTintColor: "#000",
-          inactiveTintColor: "#000"
+          activeTintColor: "#fff",
+          inactiveTintColor: "#fff"
         }}
         drawerStyle={{
-          backgroundColor: "#fff",
+          backgroundColor: "#0d4372",
           color: "#000",
-          activeTintColor: "#f1f1f1"
+          activeTintColor: "#fff"
         }}
       >
-        <Drawer.Screen initialParams={{screen:0}} name="Главная" icon="menu" component={StuckNavigator} />
+        <Drawer.Screen
+          initialParams={{screen:0}} name="Главная" icon="menu" component={StuckNavigator} />
 
 
   
