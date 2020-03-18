@@ -63,7 +63,7 @@ export default function EventCard(props) {
             }}
             
             />
-            {eventData.seanses != undefined ? <Text style={styles.badge}>до {moment(eventData.seanses[eventData.seanses.length -1].date).locale("ru", localization).format("D MMMM")}</Text> : eventData.price != undefined ? <Text style={[eventData.price.length > 10 ? styles.topBadge : styles.badge]}>{eventData.price}</Text> :  false}
+            {eventData.seanses != undefined ? <Text style={styles.badge}>до {moment(eventData.seanses[eventData.seanses.length -1].date).locale("ru", localization).format("D MMMM")}</Text> : eventData.price != undefined ? <Text style={[eventData.price.length > 10 ? styles.topBadge : styles.badge]}>{eventData.price} руб.</Text> :  false}
             </View>
             <View style={[styles.infoContainer]}>
           <Text style={styles.tag}>{eventData.type_afisha  ?  eventData.type_afisha.name :  afisha_type[eventData.type_afisha] !== undefined ? afisha_type[eventData.type_afisha] : eventData.type_afisha}</Text>

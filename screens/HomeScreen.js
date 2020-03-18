@@ -203,7 +203,7 @@ export default function HomeScreen(props) {
           onPress={() => props.navigation.openDrawer()}
         />
       </LinearGradient>
-      <ScrollView
+      <View
         onScroll={({nativeEvent}) => {
           if (isCloseToBottom(nativeEvent)) {
             
@@ -277,7 +277,7 @@ export default function HomeScreen(props) {
             )
           })}
         </ScrollView>
-    </ScrollView>
+    </View>
     <View style={styles.detailCategory}>
       <Button style={{
                       backgroundColor:'#1E87F0',

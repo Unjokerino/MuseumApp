@@ -139,7 +139,6 @@ export default function DetailEventScreen(props) {
                         })
                     
                     }
-                    {console.log(Array.isArray(eventData.gallery))}
                     {Array.isArray(eventData.gallery) &&
                     <View>
                         <Caption style={[styles.caption,{marginBottom:10}]}>Фотогаллерея</Caption>
