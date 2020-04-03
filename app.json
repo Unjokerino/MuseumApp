@@ -23,12 +23,15 @@
         "assetBundlePatterns": [
             "**/*"
         ],
+        "notification": {
+            "icon": "./assets/images/icon.png"
+        },
         "ios": {
             "supportsTablet": true,
             "bundleIdentifier": "com.museumnoyabrsk.museumapp"
         },
         "android": {
-            "versionCode": 4,
+            "versionCode": 5,
             "permissions": [],
             "package": "com.museumnoyabrsk.museumapp"
         }

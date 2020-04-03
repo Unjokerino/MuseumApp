@@ -16,6 +16,7 @@
     "@types/moment": "^2.13.0",
     "expo": "~36.0.0",
     "expo-linear-gradient": "~8.0.0",
+    "firebase": "^7.13.2",
     "fuse.js": "^3.4.6",
     "moment": "^2.24.0",
     "react": "~16.9.0",
