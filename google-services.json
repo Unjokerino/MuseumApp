@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "673436752860",
+    "firebase_url": "https://museaumapp.firebaseio.com",
+    "project_id": "museaumapp",
+    "storage_bucket": "museaumapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:673436752860:android:c52b308fe0249a49008d19",
+        "android_client_info": {
+          "package_name": "com.museumnoyabrsk.museumapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "673436752860-bj79amroglm2aku8n7ap26kstgpv0lpc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUgm4OaRilGsjaWYgTMCkKxy9VL0xqQPA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "673436752860-bj79amroglm2aku8n7ap26kstgpv0lpc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
