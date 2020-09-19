@@ -32,9 +32,11 @@
             "bundleIdentifier": "com.museumnoyabrsk.museumapp"
         },
         "android": {
-            "versionCode": 5,
+            "versionCode": 6,
             "permissions": [],
-            "package": "com.museumnoyabrsk.museumapp"
+            "package": "com.museumnoyabrsk.museumapp",
+            "googleServicesFile": "./google-services.json"
+
         }
     }
 }
